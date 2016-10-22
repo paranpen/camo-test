@@ -6,5 +6,5 @@ mondgoDB setup
    - db
  - log
 
-* mongo-start *
+mongo-start
 ./mongod --directoryperdb --dbpath d:/mongodb/Server/3.2/data/db --logpath d:/mongodb/Server/3.2/log/mongodb.log --logappend 
