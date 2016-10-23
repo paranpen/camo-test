@@ -1,47 +1,53 @@
 var Document = require('camo').Document
 var EmbeddedDocument = require('camo').EmbeddedDocument
 
-class EnumValue extends EmbeddedDocument {
+// define schema
+class MetaData extends Document {
   constructor() {
     super()
 
     this.name = String
-    this.value = Number
-  }
-}
-
-class EnumList extends Document {
-  constructor() {
-    super()
-
-    this.name = String
-    this.list = [EnumValue]
     this.description = String
+    this.parentName = String
+    this.value = Number
+    this.customer = MetaData
+    this.neType = MetaData
+    this.sysType = MetaData
   }
 }
 
-var enumValue1 = EnumValue.create({
-  name: "MIN_CELL_CONF",
-  value: 0
-})
+class MetaClass extends Document {
+  constructor() {
+    super()
 
-var enumValue2 = EnumValue.create({
-  name: "DEF_CELL_CONF",
-  value: 5
-})
+    this.name = String
+    this.description = String
+    this.classType = [String]
+    this.attrList = [MetaData]
+  }
+}
 
-var enumValue3 = EnumValue.create({
-  name: "MAX_CELL_CONF",
-  value: 10
-})
-
-
-var enumList = EnumList.create({
+// populate data
+var m1 = MetaData.create({name: "MIN_CELL_CONF", description:"...", parentName:"ENUM_CELL_CONF", value: 0})
+var m2 = MetaData.create({name: "DEF_CELL_CONF", description:"...", parentName:"ENUM_CELL_CONF", value: 5})
+var m3 = MetaData.create({name: "MAX_CELL_CONF", description:"...", parentName:"ENUM_CELL_CONF", value: 10})
+var enumCellConf = MetaClass.create({
   name: "ENUM_CELL_CONF",
   description: "...",
-  list: [enumValue1, enumValue2, enumValue3]
+  attrList: [m1, m2, m3]
 })
 
-enumList.save().then(function() {
-    console.log('enumList saved!');
-});
+m1.save().then(function() {
+  m2.save().then(function() {
+    m3.save().then(function() {
+      enumCellConf.save().then(function() {
+        console.log('enumCellCOnf saved!')
+      })
+    })
+  })
+})
+
+module.exports = {
+  MetaClass: MetaClass,
+  MetaData:MetaData 
+};

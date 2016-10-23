@@ -1,42 +1,58 @@
 var Document = require('camo').Document
 var EmbeddedDocument = require('camo').EmbeddedDocument
+var MetaData = require('./metadata').Metadata
+var MetaClass = require('./metadata').MetaClass
 
-class Metadata extends EmbeddedDocument {
+class ParamValue extends EmbeddedDocument {
   constructor() {
     super()
 
-    this.default = String
-    this.min = String
-    this.max = String
-    this.enum = [String]
+    this.defaultValue = String
+    this.minValue = String
+    this.maxValue = String
+    this.metaClass = MetaClass
+    this.defaultRef = MetaData
+    this.minRef = MetaData
+    this.maxRef = MetaData
   }
 }
-
 class Parameter extends Document {
   constructor() {
     super()
 
     this.name = String
-    this.value = Number
     this.description = String
-    this.metadata = Metadata
+    this.value = ParamValue
+    this.parentName = String
   }
 }
 
-var enumList = ["MIN_CELL_CONF","DEF_CELL_CONF","MAX_CELL_CONF"] 
-var metadata = Metadata.create({
-  default: "DEF_CELL_CONF",
-  min: "MIN_CELL_CONF",
-  max: "MAX_CELL_CONF",
-  enum: enumList
-})
+class Relation extends Document {
+  constructor() {
+    super()
+
+    this.name = String
+    this.description = String
+    this.attrList = [Parameter]
+  }
+}
+
 var pname = "CellParam"
 var cellParam = Parameter.create({
   name: pname,
   value: 999,
-  description: "abcdefg",
-  metadata: metadata
+  description: "...",
+  parentName: "CellConf"
 })
+var cellConf = Relation.create({
+  name: "CellConf",
+  description: "...",
+  attrList: [cellParam]
+})
+
 cellParam.save().then(function() {
-    console.log('cellParam saved!');
-});
+    console.log('cellParam saved!')
+    cellConf.save().then(function() {
+      console.log('cellConf saved!')
+    })
+})
